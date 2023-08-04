@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import './drawer_page/home.dart';
-import './drawer_page/project.dart';
+// import './drawer_page/project.dart';
 import './drawer_page/projects.dart';
 import './drawer_page/setting.dart';
 import 'drawer_page/project_video.dart';
@@ -19,7 +19,7 @@ class _BasicScreenState extends State<BasicScreen> {
     Home_Page(),
     Settings_Page(),
     Projects_Page(),
-    Project_Page(name: "Temporary Project (Photo)"),
+    // Project_Page(name: "Temporary Project (Photo)"),
     Project_Video_Page(name: "Temporary Project (Video)"),
   ];
 
@@ -68,37 +68,38 @@ class _BasicScreenState extends State<BasicScreen> {
             //     title: const Text('Settings', style: TextStyle(fontSize: 25)),
             //   ),
             // ),
+            GestureDetector(
+              onTap: () {
+                _onItemTapped(2);
+                Navigator.pop(context);
+              },
+              child: ListTile(
+                leading: const CircleAvatar(child: Icon(Icons.folder)),
+                title: const Text('Projects', style: TextStyle(fontSize: 25)),
+              ),
+            ),
+            SizedBox(height: 10),
             // GestureDetector(
             //   onTap: () {
-            //     _onItemTapped(2);
+            //     _onItemTapped(3);
             //     Navigator.pop(context);
             //   },
             //   child: ListTile(
-            //     leading: const CircleAvatar(child: Icon(Icons.folder)),
-            //     title: const Text('Projects', style: TextStyle(fontSize: 25)),
+            //     leading: const CircleAvatar(child: Icon(Icons.image)),
+            //     title: const Text('Temporary Project (Photo)',
+            //         style: TextStyle(fontSize: 25)),
             //   ),
             // ),
+            // SizedBox(height: 10),
             GestureDetector(
               onTap: () {
                 _onItemTapped(3);
                 Navigator.pop(context);
               },
               child: ListTile(
-                leading: const CircleAvatar(child: Icon(Icons.image)),
-                title: const Text('Temporary Project (Photo)',
-                    style: TextStyle(fontSize: 25)),
-              ),
-            ),
-            SizedBox(height: 10),
-            GestureDetector(
-              onTap: () {
-                _onItemTapped(4);
-                Navigator.pop(context);
-              },
-              child: ListTile(
                 leading: const CircleAvatar(child: Icon(Icons.videocam)),
-                title: const Text('Temporary Project (Video)',
-                    style: TextStyle(fontSize: 25)),
+                title:
+                    const Text('Video Project', style: TextStyle(fontSize: 25)),
               ),
             ),
             SizedBox(height: 10),

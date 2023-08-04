@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:AIis/drawer_page/project.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class Projects_Page extends StatefulWidget {
   @override
@@ -10,10 +14,8 @@ class _Projects_PageState extends State<Projects_Page>
     with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
-  int _state = 0;
 
-  final List<Widget> _Project_list = [];
-  final List<Widget> _projectPages = [];
+  List<Widget> _Project_list = [];
   //打字視窗
   void _showDialog() {
     String _inputText = '';
@@ -42,9 +44,7 @@ class _Projects_PageState extends State<Projects_Page>
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
-                  print('Entered text: $_inputText');
-                  final page = Project_Page(name: _inputText);
-                  _addChild(page, _state++);
+                  _addProject(_inputText);
                 },
                 child: const Text('OK'),
               ),
@@ -53,11 +53,21 @@ class _Projects_PageState extends State<Projects_Page>
         });
   }
 
-  //新增project
-  void _addChild(Project_Page page, int state) {
-    _projectPages.add(page);
-    setState(() {
-      _Project_list.add(Column(children: [
+  Future<void> _loadFolders() async {
+    Directory appDir = await getApplicationDocumentsDirectory();
+    List<FileSystemEntity> files = appDir.listSync();
+    List<Directory> folders = files
+        .where((entity) => entity is Directory)
+        .map((entity) => entity as Directory)
+        .toList();
+    folders.sort((a, b) => a.path.compareTo(b.path));
+
+    List<Widget> Project_list = [];
+    for (final folder in folders) {
+      int slashIndex = folder.path.lastIndexOf('/');
+      String projectName = folder.path.substring(slashIndex + 1);
+      final page = Project_Page(name: projectName);
+      Project_list.add(Column(children: [
         Row(
           children: [
             SizedBox(width: 10),
@@ -65,14 +75,56 @@ class _Projects_PageState extends State<Projects_Page>
             SizedBox(width: 20), // 加入一個間距
             Expanded(
               child: Text(
-                page.name, // 檔案名稱
-                style: TextStyle(fontSize: 35),
+                projectName, // 檔案名稱
+                style: TextStyle(fontSize: 20),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
             SizedBox(width: 10),
             IconButton(
-              icon: const Icon(Icons.edit, size: 40),
+              icon: const Icon(Icons.delete, size: 30),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text('Confirm'),
+                    content:
+                        Text('Are you sure you want to delete this project?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text('Cancel'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () async {
+                          final Directory_to_be_deleted =
+                              Directory('${appDir.path}/$projectName');
+                          Directory_to_be_deleted.delete(recursive: true);
+                          Fluttertoast.showToast(
+                              msg: "Project deleted!",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.BOTTOM,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.green,
+                              textColor: Colors.white,
+                              fontSize: 16.0);
+                          await _loadFolders();
+                          Navigator.pop(context);
+                        },
+                        child: Text('Delete'),
+                        style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.all<Color>(Colors.red)),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.edit, size: 30),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -92,17 +144,36 @@ class _Projects_PageState extends State<Projects_Page>
         ),
         SizedBox(height: 30)
       ]));
+    }
+    setState(() {
+      _Project_list = Project_list;
     });
+  }
+
+  //新增project
+  Future<void> _addProject(String ProjectName) async {
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    Directory newDirectory = Directory('${appDocDir.path}/$ProjectName');
+    if (await newDirectory.exists() == false) {
+      newDirectory.create().then((Directory directory) {});
+    }
+    _loadFolders();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFolders();
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
-        // appBar: AppBar(
-        //   backgroundColor: Color.fromARGB(255, 53, 58, 83),
-        //   title: const Text('Projects'),
-        // ),
+        appBar: AppBar(
+          backgroundColor: Color.fromARGB(255, 53, 58, 83),
+          title: const Text('Projects'),
+        ),
         body: Column(
           children: [
             SizedBox(height: 30),

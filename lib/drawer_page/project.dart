@@ -28,8 +28,9 @@ class _Project_PageState extends State<Project_Page>
   Future<void> _saveImage(String imagePath) async {
     final File file = File(imagePath);
     final appDir = await getApplicationDocumentsDirectory();
+    final directory = Directory('${appDir.path}/$name');
     final fileName = DateTime.now().toIso8601String();
-    await file.copy('${appDir.path}/$fileName.jpeg');
+    await file.copy('${directory.path}/$fileName.jpeg');
     setState(() {
       _images_list.add(Column(children: [
         Row(
@@ -78,7 +79,7 @@ class _Project_PageState extends State<Project_Page>
 
   Future<void> _loadImages() async {
     final appDir = await getApplicationDocumentsDirectory();
-    final directory = Directory(appDir.path);
+    final directory = Directory('${appDir.path}/$name');
     final files = await directory.list().toList();
     files.sort((a, b) => a.path.compareTo(b.path));
     List<Widget> imageFiles = [];
@@ -108,6 +109,7 @@ class _Project_PageState extends State<Project_Page>
                       MaterialPageRoute(
                           builder: (context) => Result_Page(
                                 imagePath: file.path,
+                                ProjectName: name,
                               )));
                   _loadImages();
                 },
@@ -173,7 +175,7 @@ class _Project_PageState extends State<Project_Page>
         floatingActionButton: FloatingActionButton(
           heroTag: UniqueKey(),
           onPressed: () async {
-            this.pushToCamera(context);
+            pushToCamera(context);
           },
           child: const Icon(Icons.camera_alt),
         ));
@@ -182,7 +184,8 @@ class _Project_PageState extends State<Project_Page>
 
 class Result_Page extends StatelessWidget {
   late final String imagePath;
-  Result_Page({required this.imagePath});
+  final ProjectName;
+  Result_Page({required this.imagePath, this.ProjectName});
 
   Future<File> getFileFromPath(String path) async {
     return File(path);
@@ -196,9 +199,10 @@ class Result_Page extends StatelessWidget {
     if (response.statusCode == 200) {
       final fileResponse = await http.Response.fromStream(response);
       final bytes = fileResponse.bodyBytes;
-      final appDir = await getApplicationDocumentsDirectory();
+      // final appDir = await getApplicationDocumentsDirectory();
+      String appDir = path.dirname(imagePath);
       String fileName = path.basenameWithoutExtension(imagePath);
-      final orthoImageFile = File('${appDir.path}/$fileName' '_Result.jpeg');
+      final orthoImageFile = File('$appDir/$fileName' '_Result.jpeg');
       await orthoImageFile.writeAsBytes(bytes);
       Fluttertoast.showToast(
           msg: "Processed photo received!",
@@ -294,8 +298,10 @@ class Result_Page extends StatelessWidget {
                                 final File file = File(imagePath);
                                 final appDir =
                                     await getApplicationDocumentsDirectory();
+                                final directory =
+                                    Directory('${appDir.path}/$ProjectName');
                                 await file
-                                    .copy('${appDir.path}/$new_name.jpeg');
+                                    .copy('${directory.path}/$new_name.jpeg');
                                 file.delete();
                               }
                               Navigator.of(context).pop();
