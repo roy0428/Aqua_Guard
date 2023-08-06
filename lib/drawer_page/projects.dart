@@ -5,20 +5,21 @@ import 'package:AIis/drawer_page/project.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-class Projects_Page extends StatefulWidget {
+class ProjectsPage extends StatefulWidget {
+  const ProjectsPage({super.key});
+
   @override
-  _Projects_PageState createState() => _Projects_PageState();
+  State<ProjectsPage> createState() => _ProjectsPageState();
 }
 
-class _Projects_PageState extends State<Projects_Page>
+class _ProjectsPageState extends State<ProjectsPage>
     with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
-  List<Widget> _Project_list = [];
-  //打字視窗
+  List<Widget> projectlist = [];
   void _showDialog() {
-    String _inputText = '';
+    String inputText = '';
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -27,7 +28,7 @@ class _Projects_PageState extends State<Projects_Page>
             content: TextField(
               onChanged: (value) {
                 setState(() {
-                  _inputText = value;
+                  inputText = value;
                 });
               },
               decoration: const InputDecoration(
@@ -44,7 +45,7 @@ class _Projects_PageState extends State<Projects_Page>
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
-                  _addProject(_inputText);
+                  _addProject(inputText);
                 },
                 child: const Text('OK'),
               ),
@@ -55,47 +56,52 @@ class _Projects_PageState extends State<Projects_Page>
 
   Future<void> _loadFolders() async {
     Directory appDir = await getApplicationDocumentsDirectory();
+    appDir = Directory('${appDir.path}/Projects');
+
+    if (await appDir.exists() == false) {
+      await appDir.create().then((Directory directory) {});
+    }
+
     List<FileSystemEntity> files = appDir.listSync();
-    List<Directory> folders = files
-        .where((entity) => entity is Directory)
-        .map((entity) => entity as Directory)
-        .toList();
+    List<Directory> folders =
+        files.whereType<Directory>().map((entity) => entity).toList();
     folders.sort((a, b) => a.path.compareTo(b.path));
 
-    List<Widget> Project_list = [];
+    // ignore: no_leading_underscores_for_local_identifiers
+    List<Widget> _projectlist = [];
     for (final folder in folders) {
       int slashIndex = folder.path.lastIndexOf('/');
       String projectName = folder.path.substring(slashIndex + 1);
-      final page = Project_Page(name: projectName);
-      Project_list.add(Column(children: [
+      final page = ProjectPage(name: projectName);
+      _projectlist.add(Column(children: [
         Row(
           children: [
-            SizedBox(width: 10),
-            Icon(Icons.folder, size: 50), // 前方檔案icon
-            SizedBox(width: 20), // 加入一個間距
+            const SizedBox(width: 10),
+            const Icon(Icons.folder, size: 50),
+            const SizedBox(width: 20),
             Expanded(
               child: Text(
-                projectName, // 檔案名稱
-                style: TextStyle(fontSize: 20),
+                projectName,
+                style: const TextStyle(fontSize: 20),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
             IconButton(
               icon: const Icon(Icons.delete, size: 30),
               onPressed: () {
                 showDialog(
                   context: context,
                   builder: (context) => AlertDialog(
-                    title: Text('Confirm'),
-                    content:
-                        Text('Are you sure you want to delete this project?'),
+                    title: const Text('Confirm'),
+                    content: const Text(
+                        'Are you sure you want to delete this project?'),
                     actions: [
                       TextButton(
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        child: Text('Cancel'),
+                        child: const Text('Cancel'),
                       ),
                       ElevatedButton(
                         onPressed: () async {
@@ -113,10 +119,10 @@ class _Projects_PageState extends State<Projects_Page>
                           await _loadFolders();
                           Navigator.pop(context);
                         },
-                        child: Text('Delete'),
                         style: ButtonStyle(
                             backgroundColor:
                                 MaterialStateProperty.all<Color>(Colors.red)),
+                        child: const Text('Delete'),
                       ),
                     ],
                   ),
@@ -132,32 +138,33 @@ class _Projects_PageState extends State<Projects_Page>
                 );
               },
             ),
-            SizedBox(width: 10)
+            const SizedBox(width: 10)
           ],
         ),
-        SizedBox(height: 15),
+        const SizedBox(height: 15),
         Container(
           height: 1,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             border: Border(bottom: BorderSide(width: 1, color: Colors.grey)),
           ),
         ),
-        SizedBox(height: 30)
+        const SizedBox(height: 30)
       ]));
     }
     setState(() {
-      _Project_list = Project_list;
+      projectlist = _projectlist;
     });
   }
 
   //新增project
-  Future<void> _addProject(String ProjectName) async {
+  Future<void> _addProject(String projectName) async {
     Directory appDocDir = await getApplicationDocumentsDirectory();
-    Directory newDirectory = Directory('${appDocDir.path}/$ProjectName');
+    Directory newDirectory =
+        Directory('${appDocDir.path}/Projects/$projectName');
     if (await newDirectory.exists() == false) {
-      newDirectory.create().then((Directory directory) {});
+      await newDirectory.create().then((Directory directory) {});
     }
-    _loadFolders();
+    await _loadFolders();
   }
 
   @override
@@ -171,15 +178,15 @@ class _Projects_PageState extends State<Projects_Page>
     super.build(context);
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Color.fromARGB(255, 53, 58, 83),
+          backgroundColor: const Color.fromARGB(255, 53, 58, 83),
           title: const Text('Projects'),
         ),
         body: Column(
           children: [
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
             Expanded(
               child: ListView(
-                children: _Project_list,
+                children: projectlist,
               ),
             )
           ],

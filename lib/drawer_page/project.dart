@@ -9,132 +9,84 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:AIis/camera/take_picture_screen.dart';
 
-class Project_Page extends StatefulWidget {
+class ProjectPage extends StatefulWidget {
   final String name;
-  Project_Page({required this.name});
+  const ProjectPage({super.key, required this.name});
+
   @override
-  _Project_PageState createState() => _Project_PageState(name: name);
+  // ignore: no_logic_in_create_state
+  State<ProjectPage> createState() => _ProjectPageState(name: name);
 }
 
-class _Project_PageState extends State<Project_Page>
+class _ProjectPageState extends State<ProjectPage>
     with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
-  List<Widget> _images_list = [];
+  List<Widget> imageslist = [];
   final String name;
-  _Project_PageState({required this.name});
-
-  Future<void> _saveImage(String imagePath) async {
-    final File file = File(imagePath);
-    final appDir = await getApplicationDocumentsDirectory();
-    final directory = Directory('${appDir.path}/$name');
-    final fileName = DateTime.now().toIso8601String();
-    await file.copy('${directory.path}/$fileName.jpeg');
-    setState(() {
-      _images_list.add(Column(children: [
-        Row(
-          children: [
-            SizedBox(width: 10),
-            Icon(Icons.image, size: 50),
-            SizedBox(width: 20),
-            Expanded(
-              child: Text(
-                '$fileName.jpeg',
-                style: TextStyle(fontSize: 15),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            SizedBox(width: 10),
-            IconButton(
-              icon: const Icon(Icons.search, size: 40),
-              onPressed: () async {
-                final File? new_image = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => Result_Page(
-                              imagePath: '${appDir.path}/$fileName.jpeg',
-                            )));
-                if (new_image != null) {
-                  await Future.delayed(Duration.zero);
-                  _saveImage(new_image.path);
-                }
-              },
-            ),
-            SizedBox(width: 10)
-          ],
-        ),
-        SizedBox(height: 15),
-        Container(
-          height: 1,
-          decoration: BoxDecoration(
-            border: Border(bottom: BorderSide(width: 1, color: Colors.grey)),
-          ),
-        ),
-        SizedBox(height: 30)
-      ]));
-    });
-    _loadImages();
-  }
+  _ProjectPageState({required this.name});
 
   Future<void> _loadImages() async {
     final appDir = await getApplicationDocumentsDirectory();
-    final directory = Directory('${appDir.path}/$name');
+    final directory = Directory('${appDir.path}/Projects/$name');
     final files = await directory.list().toList();
     files.sort((a, b) => a.path.compareTo(b.path));
-    List<Widget> imageFiles = [];
+    // ignore: no_leading_underscores_for_local_identifiers
+    List<Widget> _imageslist = [];
     for (final file in files) {
       if (file.path.endsWith('.jpeg')) {
         int slashIndex = file.path.lastIndexOf('/');
         String fileName = file.path.substring(slashIndex + 1);
-        imageFiles.add(Column(children: [
+        _imageslist.add(Column(children: [
           Row(
             children: [
-              SizedBox(width: 10),
-              Icon(Icons.image, size: 50),
-              SizedBox(width: 20),
+              const SizedBox(width: 10),
+              const Icon(Icons.image, size: 50),
+              const SizedBox(width: 20),
               Expanded(
                 child: Text(
                   fileName,
-                  style: TextStyle(fontSize: 15),
+                  style: const TextStyle(fontSize: 15),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               IconButton(
                 icon: const Icon(Icons.search, size: 40),
                 onPressed: () async {
                   await Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => Result_Page(
+                          builder: (context) => ResultPage(
                                 imagePath: file.path,
-                                ProjectName: name,
+                                projectName: name,
                               )));
-                  _loadImages();
+                  await _loadImages();
                 },
               ),
-              SizedBox(width: 10)
+              const SizedBox(width: 10)
             ],
           ),
-          SizedBox(height: 15),
+          const SizedBox(height: 15),
           Container(
             height: 1,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               border: Border(bottom: BorderSide(width: 1, color: Colors.grey)),
             ),
           ),
-          SizedBox(height: 30)
+          const SizedBox(height: 30)
         ]));
       }
     }
     setState(() {
-      _images_list = imageFiles;
+      imageslist = _imageslist;
     });
   }
 
   void pushToCamera(BuildContext context) async {
     final cameras = await availableCameras();
+    // ignore: use_build_context_synchronously
     final String? imagePath = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -142,8 +94,12 @@ class _Project_PageState extends State<Project_Page>
       ),
     );
     if (imagePath != null) {
-      await Future.delayed(Duration.zero);
-      _saveImage(imagePath);
+      final File file = File(imagePath);
+      final appDir = await getApplicationDocumentsDirectory();
+      final directory = Directory('${appDir.path}/Projects/$name');
+      final fileName = DateTime.now().toIso8601String();
+      await file.copy('${directory.path}/$fileName.jpeg');
+      await _loadImages();
     }
   }
 
@@ -158,16 +114,16 @@ class _Project_PageState extends State<Project_Page>
     super.build(context);
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Color.fromARGB(255, 53, 58, 83),
-          title: Text('$name'),
+          backgroundColor: const Color.fromARGB(255, 53, 58, 83),
+          title: Text(name),
           centerTitle: true,
         ),
         body: Column(
           children: [
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
             Expanded(
               child: ListView(
-                children: _images_list,
+                children: imageslist,
               ),
             )
           ],
@@ -182,14 +138,14 @@ class _Project_PageState extends State<Project_Page>
   }
 }
 
-class Result_Page extends StatelessWidget {
-  late final String imagePath;
-  final ProjectName;
-  Result_Page({required this.imagePath, this.ProjectName});
+class ResultPage extends StatelessWidget {
+  final String imagePath;
+  final String projectName;
+  const ResultPage({super.key, required this.imagePath, required this.projectName});
 
-  Future<File> getFileFromPath(String path) async {
-    return File(path);
-  }
+  // Future<File> getFileFromPath(String path) async {
+  //   return File(path);
+  // }
 
   Future<File> _uploadImage(String imagePath) async {
     final url = Uri.parse('http://140.112.12.167:8000/upload/');
@@ -199,7 +155,6 @@ class Result_Page extends StatelessWidget {
     if (response.statusCode == 200) {
       final fileResponse = await http.Response.fromStream(response);
       final bytes = fileResponse.bodyBytes;
-      // final appDir = await getApplicationDocumentsDirectory();
       String appDir = path.dirname(imagePath);
       String fileName = path.basenameWithoutExtension(imagePath);
       final orthoImageFile = File('$appDir/$fileName' '_Result.jpeg');
@@ -222,7 +177,7 @@ class Result_Page extends StatelessWidget {
         backgroundColor: Colors.green,
         textColor: Colors.white,
         fontSize: 16.0);
-    return getFileFromPath(imagePath);
+    return File(imagePath);
   }
 
   void showLoadingDialog(BuildContext context) {
@@ -265,13 +220,13 @@ class Result_Page extends StatelessWidget {
     String fileName = imagePath.substring(slashIndex + 1);
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Color.fromARGB(255, 53, 58, 83),
+          backgroundColor: const Color.fromARGB(255, 53, 58, 83),
           title: Text(fileName),
           actions: <Widget>[
             IconButton(
-              icon: Icon(Icons.edit),
+              icon: const Icon(Icons.edit),
               onPressed: () {
-                String new_name = '';
+                String newname = '';
                 showDialog(
                     context: context,
                     builder: (BuildContext context) {
@@ -279,7 +234,7 @@ class Result_Page extends StatelessWidget {
                         title: const Text('Rename Photo'),
                         content: TextField(
                           onChanged: (value) {
-                            new_name = value;
+                            newname = value;
                           },
                           decoration: const InputDecoration(
                             hintText: 'Enter some text',
@@ -294,14 +249,14 @@ class Result_Page extends StatelessWidget {
                           ),
                           TextButton(
                             onPressed: () async {
-                              if (new_name != '') {
+                              if (newname != '') {
                                 final File file = File(imagePath);
                                 final appDir =
                                     await getApplicationDocumentsDirectory();
-                                final directory =
-                                    Directory('${appDir.path}/$ProjectName');
+                                // final directory =
+                                //     Directory('${appDir.path}/Projects/$projectName');
                                 await file
-                                    .copy('${directory.path}/$new_name.jpeg');
+                                    .copy('${appDir.path}/Projects/$projectName/$newname.jpeg');
                                 file.delete();
                               }
                               Navigator.of(context).pop();
@@ -335,22 +290,22 @@ class Result_Page extends StatelessWidget {
                 child: Align(
                     alignment: Alignment.bottomLeft,
                     child: Padding(
-                        padding: EdgeInsets.only(left: 32.0),
+                        padding: const EdgeInsets.only(left: 32.0),
                         child: FloatingActionButton(
                           heroTag: UniqueKey(),
                           onPressed: () async {
                             showDialog(
                               context: context,
                               builder: (context) => AlertDialog(
-                                title: Text('Confirm'),
-                                content: Text(
+                                title: const Text('Confirm'),
+                                content: const Text(
                                     'Are you sure you want to delete this photo?'),
                                 actions: [
                                   TextButton(
                                     onPressed: () {
                                       Navigator.pop(context);
                                     },
-                                    child: Text('Cancel'),
+                                    child: const Text('Cancel'),
                                   ),
                                   ElevatedButton(
                                     onPressed: () {
@@ -367,11 +322,11 @@ class Result_Page extends StatelessWidget {
                                       Navigator.pop(context);
                                       Navigator.pop(context);
                                     },
-                                    child: Text('Delete'),
                                     style: ButtonStyle(
                                         backgroundColor:
                                             MaterialStateProperty.all<Color>(
                                                 Colors.red)),
+                                    child: const Text('Delete'),
                                   ),
                                 ],
                               ),
@@ -382,22 +337,22 @@ class Result_Page extends StatelessWidget {
             Align(
                 alignment: Alignment.bottomCenter,
                 child: Padding(
-                    padding: EdgeInsets.only(left: 24.0),
+                    padding: const EdgeInsets.only(left: 24.0),
                     child: FloatingActionButton(
                       heroTag: UniqueKey(),
                       onPressed: () async {
                         showDialog(
                           context: context,
                           builder: (context) => AlertDialog(
-                            title: Text('Confirm'),
-                            content: Text(
+                            title: const Text('Confirm'),
+                            content: const Text(
                                 'Are you sure you want to upload this photo?'),
                             actions: [
                               TextButton(
                                 onPressed: () {
                                   Navigator.pop(context);
                                 },
-                                child: Text('Cancel'),
+                                child: const Text('Cancel'),
                               ),
                               ElevatedButton(
                                   onPressed: () async {
@@ -407,18 +362,7 @@ class Result_Page extends StatelessWidget {
                                     Navigator.pop(context);
                                     Navigator.pop(context);
                                   },
-                                  child: Text('Upload')),
-                              // ElevatedButton(
-                              //   onPressed: () async {
-                              //     showLoadingDialog(context);
-                              //     await _uploadImage(imagePath, 1);
-                              //     Navigator.pop(context);
-                              //     Navigator.pop(context);
-                              //     Navigator.pop(context);
-                              //   },
-                              //   child: Text('Upload (Org)',
-                              //       style: TextStyle(fontSize: 10)),
-                              // ),
+                                  child: const Text('Upload')),
                             ],
                           ),
                         );
@@ -433,15 +377,15 @@ class Result_Page extends StatelessWidget {
                     showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
-                        title: Text('Confirm'),
+                        title: const Text('Confirm'),
                         content:
-                            Text('Are you sure you want to save this photo?'),
+                            const Text('Are you sure you want to save this photo?'),
                         actions: [
                           TextButton(
                             onPressed: () {
                               Navigator.pop(context);
                             },
-                            child: Text('Cancel'),
+                            child: const Text('Cancel'),
                           ),
                           ElevatedButton(
                               onPressed: () async {
@@ -457,7 +401,7 @@ class Result_Page extends StatelessWidget {
                                 Navigator.pop(context);
                                 Navigator.pop(context);
                               },
-                              child: Text('Save')),
+                              child: const Text('Save')),
                         ],
                       ),
                     );

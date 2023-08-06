@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 //import 'package:app_stateful_test/main.dart';
 
-class Settings_Page extends StatefulWidget {
+class SettingsPage extends StatefulWidget {
+  const SettingsPage({super.key});
+
   @override
-  _Settings_PageState createState() => _Settings_PageState();
+  State<SettingsPage> createState() => _SettingsPageState();
 }
 
-class _Settings_PageState extends State<Settings_Page> {
+class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
         // appBar: AppBar(
         //   backgroundColor: Color.fromARGB(255, 53, 58, 83),
         //   title: Text('Setting'),
