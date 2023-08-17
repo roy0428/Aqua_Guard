@@ -117,6 +117,7 @@ class _ProjectsPageState extends State<ProjectsPage>
                               textColor: Colors.white,
                               fontSize: 16.0);
                           await _loadFolders();
+                          // ignore: use_build_context_synchronously
                           Navigator.pop(context);
                         },
                         style: ButtonStyle(

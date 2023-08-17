@@ -260,7 +260,9 @@ class ResultPage extends StatelessWidget {
                                     '${appDir.path}/Projects/$projectName/$newname.jpeg');
                                 file.delete();
                               }
+                              // ignore: use_build_context_synchronously
                               Navigator.of(context).pop();
+                              // ignore: use_build_context_synchronously
                               Navigator.of(context).pop();
                             },
                             child: const Text('OK'),
