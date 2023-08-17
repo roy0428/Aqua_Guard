@@ -107,7 +107,7 @@ class _ProjectsPageState extends State<ProjectsPage>
                         onPressed: () async {
                           final Directory_to_be_deleted =
                               Directory('${appDir.path}/$projectName');
-                          Directory_to_be_deleted.delete(recursive: true);
+                          await Directory_to_be_deleted.delete(recursive: true);
                           Fluttertoast.showToast(
                               msg: "Project deleted!",
                               toastLength: Toast.LENGTH_SHORT,

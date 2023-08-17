@@ -141,7 +141,8 @@ class _ProjectPageState extends State<ProjectPage>
 class ResultPage extends StatelessWidget {
   final String imagePath;
   final String projectName;
-  const ResultPage({super.key, required this.imagePath, required this.projectName});
+  const ResultPage(
+      {super.key, required this.imagePath, required this.projectName});
 
   // Future<File> getFileFromPath(String path) async {
   //   return File(path);
@@ -255,8 +256,8 @@ class ResultPage extends StatelessWidget {
                                     await getApplicationDocumentsDirectory();
                                 // final directory =
                                 //     Directory('${appDir.path}/Projects/$projectName');
-                                await file
-                                    .copy('${appDir.path}/Projects/$projectName/$newname.jpeg');
+                                await file.copy(
+                                    '${appDir.path}/Projects/$projectName/$newname.jpeg');
                                 file.delete();
                               }
                               Navigator.of(context).pop();
@@ -378,8 +379,8 @@ class ResultPage extends StatelessWidget {
                       context: context,
                       builder: (context) => AlertDialog(
                         title: const Text('Confirm'),
-                        content:
-                            const Text('Are you sure you want to save this photo?'),
+                        content: const Text(
+                            'Are you sure you want to save this photo?'),
                         actions: [
                           TextButton(
                             onPressed: () {
