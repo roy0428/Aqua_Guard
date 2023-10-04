@@ -4,7 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import './drawer_page/home.dart';
 import './drawer_page/projects.dart';
 // import './drawer_page/setting.dart';
-import 'drawer_page/project_video.dart';
+import 'drawer_page/projects_video.dart';
 
 class BasicScreen extends StatefulWidget {
   const BasicScreen({super.key});
@@ -20,7 +20,7 @@ class _BasicScreenState extends State<BasicScreen> {
     const HomePage(),
     // Settings_Page(),
     const ProjectsPage(),
-    const ProjectVideoPage(name: "Video Project"),
+    const VideoProjectsPage(),
   ];
 
   void _onItemTapped(int index) {
@@ -72,7 +72,7 @@ class _BasicScreenState extends State<BasicScreen> {
             Image.asset('assets/aiis_logo.png', height: 125, width: 100),
             listItem(context, 0, Icons.home, 'Home page', true),
             listItem(context, 1, Icons.folder, 'Projects', true),
-            listItem(context, 2, Icons.videocam, 'Video Project', true),
+            listItem(context, 2, Icons.videocam, 'Video Projects', true),
             listItem(context, -1, Icons.info, 'About us', false),
           ],
         ),
