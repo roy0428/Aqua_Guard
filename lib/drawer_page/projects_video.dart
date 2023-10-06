@@ -179,7 +179,7 @@ class _VideoProjectsPageState extends State<VideoProjectsPage>
     return Scaffold(
         appBar: AppBar(
           backgroundColor: const Color.fromARGB(255, 53, 58, 83),
-          title: const Text('Projects'),
+          title: const Text('Video Projects'),
         ),
         body: Column(
           children: [

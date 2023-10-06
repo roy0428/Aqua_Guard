@@ -3,12 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gallery_saver/gallery_saver.dart';
-// import 'package:http/http.dart' as http;
-// import 'package:path/path.dart' as path;
+import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
 // import 'package:AIis/drawer_page/project.dart';
-
 
 import 'package:AIis/camera/camera_page.dart';
 
@@ -78,6 +77,7 @@ class _ProjectVideoPageState extends State<ProjectVideoPage>
                       MaterialPageRoute(
                           builder: (context) => VideoResultPage(
                                 filePath: file.path,
+                                projectName: name,
                               )));
                   await _loadVidoesandImages();
                 },
@@ -94,8 +94,7 @@ class _ProjectVideoPageState extends State<ProjectVideoPage>
           ),
           const SizedBox(height: 30)
         ]));
-      }
-      else if(file.path.endsWith('.jpeg')){
+      } else if (file.path.endsWith('.jpeg')) {
         videoFiles.add(Column(children: [
           Row(
             children: [
@@ -179,16 +178,20 @@ class _ProjectVideoPageState extends State<ProjectVideoPage>
 
 class VideoResultPage extends StatefulWidget {
   final String filePath;
-  const VideoResultPage({super.key, required this.filePath});
+  final String projectName;
+  const VideoResultPage(
+      {super.key, required this.filePath, required this.projectName});
 
   @override
   // ignore: no_logic_in_create_state
-  State<VideoResultPage> createState() => _VideoResultPageState(videoPath: filePath);
+  State<VideoResultPage> createState() =>
+      _VideoResultPageState(videoPath: filePath, projectName: projectName);
 }
 
 class _VideoResultPageState extends State<VideoResultPage> {
   final String videoPath;
-  _VideoResultPageState({required this.videoPath});
+  final String projectName;
+  _VideoResultPageState({required this.videoPath, required this.projectName});
   late final VideoPlayerController _controller;
 
   @override
@@ -205,39 +208,39 @@ class _VideoResultPageState extends State<VideoResultPage> {
   }
 
   //TODO
-  
-  // Future<File> _uploadVideo(String videoPath) async {
-  //   final url = Uri.parse('TBD');
-  //   final request = http.MultipartRequest('POST', url);
-  //   request.files.add(await http.MultipartFile.fromPath('video', videoPath));
-  //   final response = await request.send();
-  //   if (response.statusCode == 200) {
-  //     final fileResponse = await http.Response.fromStream(response);
-  //     final bytes = fileResponse.bodyBytes;
-  //     final appDir = await getApplicationDocumentsDirectory();
-  //     String fileName = path.basenameWithoutExtension(videoPath);
-  //     final orthoImageFile = File('${appDir.path}/$fileName' '_Result.jpeg');
-  //     await orthoImageFile.writeAsBytes(bytes);
-  //     Fluttertoast.showToast(
-  //         msg: "Processed photo received!",
-  //         toastLength: Toast.LENGTH_SHORT,
-  //         gravity: ToastGravity.BOTTOM,
-  //         timeInSecForIosWeb: 1,
-  //         backgroundColor: Colors.green,
-  //         textColor: Colors.white,
-  //         fontSize: 16.0);
-  //     return orthoImageFile;
-  //   }
-  //   Fluttertoast.showToast(
-  //       msg: "Invalid Photo!",
-  //       toastLength: Toast.LENGTH_SHORT,
-  //       gravity: ToastGravity.BOTTOM,
-  //       timeInSecForIosWeb: 1,
-  //       backgroundColor: Colors.green,
-  //       textColor: Colors.white,
-  //       fontSize: 16.0);
-  //   return getFileFromPath(videoPath);
-  // }
+
+  Future<File> _uploadVideo(String videoPath) async {
+    final url = Uri.parse('http://140.112.12.167:8000/uploadvideo/');
+    final request = http.MultipartRequest('POST', url);
+    request.files.add(await http.MultipartFile.fromPath('video', videoPath));
+    final response = await request.send();
+    if (response.statusCode == 200) {
+      final fileResponse = await http.Response.fromStream(response);
+      final bytes = fileResponse.bodyBytes;
+      final appDir = path.dirname(videoPath);
+      final fileName = path.basenameWithoutExtension(videoPath);
+      final imageFile = File('$appDir/$fileName' '_Result.jpeg');
+      await imageFile.writeAsBytes(bytes);
+      Fluttertoast.showToast(
+          msg: "Processed photo received!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      return imageFile;
+    }
+    Fluttertoast.showToast(
+        msg: "Invalid Video!",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0);
+    return getFileFromPath(videoPath);
+  }
 
   void showLoadingDialog(BuildContext context) {
     showDialog(
@@ -313,7 +316,7 @@ class _VideoResultPageState extends State<VideoResultPage> {
                                 final appDir =
                                     await getApplicationDocumentsDirectory();
                                 await file.copy(
-                                    '${appDir.path}/VideoProject/$newname.mp4');
+                                    '${appDir.path}/VideoProjects/$projectName/$newname.mp4');
                                 file.delete();
                               }
                               Navigator.of(context).pop();
@@ -407,16 +410,8 @@ class _VideoResultPageState extends State<VideoResultPage> {
                                   ),
                                   ElevatedButton(
                                     onPressed: () async {
-                                      //await _uploadVideo(imagePath);
                                       showLoadingDialog(context);
-                                      Fluttertoast.showToast(
-                                          msg: "Not available right now!",
-                                          toastLength: Toast.LENGTH_SHORT,
-                                          gravity: ToastGravity.BOTTOM,
-                                          timeInSecForIosWeb: 1,
-                                          backgroundColor: Colors.green,
-                                          textColor: Colors.white,
-                                          fontSize: 16.0);
+                                      await _uploadVideo(videoPath);
                                       Navigator.pop(context);
                                       Navigator.pop(context);
                                       Navigator.pop(context);
@@ -479,43 +474,44 @@ class _VideoResultPageState extends State<VideoResultPage> {
 class ResultPage extends StatelessWidget {
   final String imagePath;
   final String projectName;
-  const ResultPage({super.key, required this.imagePath, required this.projectName});
+  const ResultPage(
+      {super.key, required this.imagePath, required this.projectName});
 
   // Future<File> getFileFromPath(String path) async {
   //   return File(path);
   // }
 
   // Future<File> _uploadImage(String imagePath) async {
-    // final url = Uri.parse('http://140.112.12.167:8000/upload/');
-    // final request = http.MultipartRequest('POST', url);
-    // request.files.add(await http.MultipartFile.fromPath('photo', imagePath));
-    // final response = await request.send();
-    // if (response.statusCode == 200) {
-    //   final fileResponse = await http.Response.fromStream(response);
-    //   final bytes = fileResponse.bodyBytes;
-    //   String appDir = path.dirname(imagePath);
-    //   String fileName = path.basenameWithoutExtension(imagePath);
-    //   final orthoImageFile = File('$appDir/$fileName' '_Result.jpeg');
-    //   await orthoImageFile.writeAsBytes(bytes);
-    //   Fluttertoast.showToast(
-    //       msg: "Processed photo received!",
-    //       toastLength: Toast.LENGTH_SHORT,
-    //       gravity: ToastGravity.BOTTOM,
-    //       timeInSecForIosWeb: 1,
-    //       backgroundColor: Colors.green,
-    //       textColor: Colors.white,
-    //       fontSize: 16.0);
-    //   return orthoImageFile;
-    // }
-    // Fluttertoast.showToast(
-    //     msg: "No Apriltag detected!",
-    //     toastLength: Toast.LENGTH_SHORT,
-    //     gravity: ToastGravity.BOTTOM,
-    //     timeInSecForIosWeb: 1,
-    //     backgroundColor: Colors.green,
-    //     textColor: Colors.white,
-    //     fontSize: 16.0);
-    // return File(imagePath);
+  // final url = Uri.parse('http://140.112.12.167:8000/upload/');
+  // final request = http.MultipartRequest('POST', url);
+  // request.files.add(await http.MultipartFile.fromPath('photo', imagePath));
+  // final response = await request.send();
+  // if (response.statusCode == 200) {
+  //   final fileResponse = await http.Response.fromStream(response);
+  //   final bytes = fileResponse.bodyBytes;
+  //   String appDir = path.dirname(imagePath);
+  //   String fileName = path.basenameWithoutExtension(imagePath);
+  //   final orthoImageFile = File('$appDir/$fileName' '_Result.jpeg');
+  //   await orthoImageFile.writeAsBytes(bytes);
+  //   Fluttertoast.showToast(
+  //       msg: "Processed photo received!",
+  //       toastLength: Toast.LENGTH_SHORT,
+  //       gravity: ToastGravity.BOTTOM,
+  //       timeInSecForIosWeb: 1,
+  //       backgroundColor: Colors.green,
+  //       textColor: Colors.white,
+  //       fontSize: 16.0);
+  //   return orthoImageFile;
+  // }
+  // Fluttertoast.showToast(
+  //     msg: "No Apriltag detected!",
+  //     toastLength: Toast.LENGTH_SHORT,
+  //     gravity: ToastGravity.BOTTOM,
+  //     timeInSecForIosWeb: 1,
+  //     backgroundColor: Colors.green,
+  //     textColor: Colors.white,
+  //     fontSize: 16.0);
+  // return File(imagePath);
   // }
 
   // void showLoadingDialog(BuildContext context) {
@@ -593,8 +589,8 @@ class ResultPage extends StatelessWidget {
                                     await getApplicationDocumentsDirectory();
                                 // final directory =
                                 //     Directory('${appDir.path}/Projects/$projectName');
-                                await file
-                                    .copy('${appDir.path}/VideoProjects/$projectName/$newname.jpeg');
+                                await file.copy(
+                                    '${appDir.path}/VideoProjects/$projectName/$newname.jpeg');
                                 file.delete();
                               }
                               Navigator.of(context).pop();
@@ -716,8 +712,8 @@ class ResultPage extends StatelessWidget {
                       context: context,
                       builder: (context) => AlertDialog(
                         title: const Text('Confirm'),
-                        content:
-                            const Text('Are you sure you want to save this photo?'),
+                        content: const Text(
+                            'Are you sure you want to save this photo?'),
                         actions: [
                           TextButton(
                             onPressed: () {
