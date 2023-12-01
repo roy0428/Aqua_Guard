@@ -1,5 +1,5 @@
 # Aqua Guard
-A Flutter project for CAECE Hackathon 2023.
+A Flutter project for CAECE Hackathon 2023 "Eyes on the Water".
 
 Demo:
 
