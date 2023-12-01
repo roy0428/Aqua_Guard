@@ -2,26 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import './drawer_page/home.dart';
-import './drawer_page/projects.dart';
-// import './drawer_page/setting.dart';
-import 'drawer_page/projects_video.dart';
+import './drawer_page/profile.dart';
 
 class BasicScreen extends StatefulWidget {
-  const BasicScreen({super.key});
+  final String username;
+
+  const BasicScreen({
+    super.key,
+    required this.username,
+  });
 
   @override
-  State<BasicScreen> createState() => _BasicScreenState();
+  // ignore: no_logic_in_create_state
+  State<BasicScreen> createState() => _BasicScreenState(username: username);
 }
 
 class _BasicScreenState extends State<BasicScreen> {
-  int _selectedIndex = 0;
+  final String username;
+  _BasicScreenState({
+    required this.username,
+  });
 
-  static final List<Widget> _widgetOptions = <Widget>[
-    const HomePage(),
-    // Settings_Page(),
-    const ProjectsPage(),
-    const VideoProjectsPage(),
-  ];
+  int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
     setState(() {
@@ -39,7 +41,16 @@ class _BasicScreenState extends State<BasicScreen> {
               _onItemTapped(index);
               Navigator.pop(context);
             } else {
-              launchUrl(Uri.parse('http://www.aiengineer.tw'));
+              if (index == 0) {
+                launchUrl(Uri.parse('http://www.aiengineer.tw'));
+              } else if (index == 1) {
+                launchUrl(Uri.parse('https://www.wrcgroup.com/about/'));
+              } else if (index == 2) {
+                launchUrl(Uri.parse('http://rainplusplus.com'));
+              } else if (index == 3) {
+                launchUrl(Uri.parse(
+                    'https://www.gov.uk/government/organisations/natural-england'));
+              }
             }
           },
           child: ListTile(
@@ -54,26 +65,23 @@ class _BasicScreenState extends State<BasicScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> _widgetOptions = <Widget>[
+      HomePage(username: username),
+      ProfilePage(),
+    ];
+
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 53, 58, 83),
-        title: const Text('AIiS'),
-        centerTitle: true,
-        actions: const <Widget>[
-          Padding(
-            padding: EdgeInsets.all(10.0),
-          ),
-        ],
-      ),
       drawer: Drawer(
         child: ListView(
           children: <Widget>[
             const SizedBox(height: 20),
-            Image.asset('assets/aiis_logo.png', height: 125, width: 100),
+            Image.asset('assets/moisture.png', height: 125, width: 100),
             listItem(context, 0, Icons.home, 'Home page', true),
-            listItem(context, 1, Icons.folder, 'Projects', true),
-            listItem(context, 2, Icons.videocam, 'Video Projects', true),
-            listItem(context, -1, Icons.info, 'About us', false),
+            listItem(context, 1, Icons.account_circle, 'Profile', true),
+            listItem(context, 1, Icons.info, 'Water Research Centre', false),
+            listItem(context, 2, Icons.info, 'Rain++', false),
+            listItem(context, 3, Icons.info, 'Natural England', false),
+            listItem(context, 0, Icons.info, 'About us', false),
           ],
         ),
       ),
