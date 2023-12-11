@@ -5,4 +5,4 @@ See the Hackathon introduction in: https://github.com/roy0428/Aqua_Guard/blob/ma
 
 Demo:
 
-![image](https://github.com/roy0428/Aqua_Guard/blob/main/home_page_demo.gif) ![image](https://github.com/roy0428/Aqua_Guard/blob/main/upload_demo.gif)
+![image](https://github.com/roy0428/Aqua_Guard/blob/main/home_page_demo.gif) ![image](https://github.com/roy0428/Aqua_Guard/blob/main/image_upload_demo.gif)
