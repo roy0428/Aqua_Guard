@@ -8,8 +8,7 @@ class DisplayPictureScreen extends StatelessWidget {
   final String imagePath;
   final String username;
 
-  const DisplayPictureScreen(
-      {super.key, required this.imagePath, required this.username});
+  const DisplayPictureScreen({super.key, required this.imagePath, required this.username});
 
   void showLoadingDialog(BuildContext context) {
     showDialog(
@@ -52,23 +51,19 @@ class DisplayPictureScreen extends StatelessWidget {
     request.files.add(await http.MultipartFile.fromPath('photo', imagePath));
     final response = await request.send();
     if (response.statusCode == 200) {
-      final Map<String, dynamic> data =
-          json.decode(await response.stream.bytesToString());
+      final Map<String, dynamic> data = json.decode(await response.stream.bytesToString());
       description = data["description"];
     }
     return description;
   }
 
-  Future<void> _uploadImageInfo(String description, String user_id) async {
+  Future<void> _uploadImageInfo(String description, String userId) async {
     final url = Uri.parse('http://140.112.12.167:8000/update/');
-    List<int> bytes = File(imagePath).readAsBytesSync();
-    String base64Image = base64Encode(bytes);
     Map<String, dynamic> data = {
-      'Image': base64Image,
       'Latitude': 53.8,
-      'Longitude': -1.7,
+      'Longitude': -1.75,
       'Description': description,
-      'UserID': user_id,
+      'UserID': userId,
     };
     await http.post(
       url,
@@ -93,8 +88,7 @@ class DisplayPictureScreen extends StatelessWidget {
                 context: context,
                 builder: (context) => AlertDialog(
                   title: const Text('Confirm'),
-                  content:
-                      const Text('Are you sure you want to upload this photo?'),
+                  content: const Text('Are you sure you want to upload this photo?'),
                   actions: [
                     TextButton(
                       onPressed: () {
@@ -105,9 +99,10 @@ class DisplayPictureScreen extends StatelessWidget {
                     ),
                     ElevatedButton(
                         onPressed: () async {
+                          showLoadingDialog(context);
                           String description = await _uploadImage(imagePath);
                           // ignore: use_build_context_synchronously
-                          showLoadingDialog(context);
+                          // showLoadingDialog(context);
                           // ignore: use_build_context_synchronously
                           showDialog(
                               context: context,
@@ -121,8 +116,9 @@ class DisplayPictureScreen extends StatelessWidget {
                                     decoration: const InputDecoration(
                                       hintText: 'Modify the description',
                                     ),
-                                    controller: TextEditingController(
-                                        text: description),
+                                    maxLines: 20,
+                                    minLines: 1,
+                                    controller: TextEditingController(text: description),
                                   ),
                                   actions: [
                                     TextButton(
