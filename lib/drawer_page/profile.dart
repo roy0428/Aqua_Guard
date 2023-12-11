@@ -298,9 +298,7 @@ class NumbersWidget extends StatelessWidget {
       );
 
 
-  Widget buildButton(BuildContext context, String value, String text) =>
-
-      MaterialButton(
+  Widget buildButton(BuildContext context, String value, String text) => MaterialButton(
 
         padding: EdgeInsets.symmetric(vertical: 4),
 
@@ -488,7 +486,7 @@ class UserPreferences {
 
     imagePath:
 
-        'https://scontent-tpe1-1.xx.fbcdn.net/v/t39.30808-6/375977784_717552333717875_56479752900812814_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=efb6e6&_nc_ohc=3ok8SYQ2zdgAX8cnQ48&_nc_ht=scontent-tpe1-1.xx&oh=00_AfBXALVXIBuRDnqZOG768Dlxwf6Ib_E-NqtNidpnpcei2g&oe=656BD767',
+        'https://scontent-tpe1-1.xx.fbcdn.net/v/t39.30808-6/375977784_717552333717875_56479752900812814_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=efb6e6&_nc_ohc=o2t0ufkrFTMAX-l8Lli&_nc_ht=scontent-tpe1-1.xx&oh=00_AfCTJTahp9WWV5CpK5UV7gVHNzRVeL0X4k4barSjjoEvmw&oe=657BA967',
 
     name: 'CAECE',
 

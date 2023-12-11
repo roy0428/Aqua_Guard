@@ -58,8 +58,7 @@ class _HomePageState extends State<HomePage> {
   late Set<Marker> markers = {};
   List<ProcessedData> resultList = [];
 
-  Future<List<ProcessedData>> _uploadLocation(
-      double latitude, double longitude) async {
+  Future<List<ProcessedData>> _uploadLocation(double latitude, double longitude) async {
     Map<String, double> data = {'Latitude': latitude, 'Longitude': longitude};
     final url = Uri.parse('http://140.112.12.167:8000/uploadlocation/');
     http.Response response = await http.post(
@@ -100,12 +99,12 @@ class _HomePageState extends State<HomePage> {
       final Directory cacheDirectory = await getTemporaryDirectory();
       final path = '${cacheDirectory.path}/cache.jpeg';
       final Map<String, dynamic> data = json.decode(response.body);
-      await File(path)
-          .writeAsBytes(base64Decode(data['image']['Image']), flush: true);
+      await File(path).writeAsBytes(base64Decode(data['image']['Image']), flush: true);
       setState(() => {imageCache.clear(), imageCache.clearLiveImages()});
       info.date = data['image']['Date'];
       info.time = data['image']['Time'];
       info.description = data['image']['Description'];
+      // print(data['image']['Description']);
     }
     return info;
   }
@@ -126,8 +125,7 @@ class _HomePageState extends State<HomePage> {
           (data) {
             BitmapDescriptor markerIcon = data.id != username
                 ? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed)
-                : BitmapDescriptor.defaultMarkerWithHue(
-                    BitmapDescriptor.hueBlue);
+                : BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue);
             return Marker(
               markerId: MarkerId('${data.latitude}-${data.longitude}'),
               position: LatLng(data.latitude, data.longitude),
@@ -213,10 +211,7 @@ class ResultPage extends StatefulWidget {
   State<ResultPage> createState() =>
       // ignore: no_logic_in_create_state
       _ResultPageState(
-          imagePath: imagePath,
-          imageName: projectName,
-          info: info,
-          uploader: uploader);
+          imagePath: imagePath, imageName: projectName, info: info, uploader: uploader);
 }
 
 class _ResultPageState extends State<ResultPage> {
@@ -333,12 +328,13 @@ class _ResultPageState extends State<ResultPage> {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: const Color.fromARGB(255, 53, 58, 83),
-          title: Text(imageName,
-              style: const TextStyle(color: Color.fromARGB(255, 33, 219, 243))),
+          title: Text(
+            imageName,
+            style: const TextStyle(color: Colors.white),
+          ),
           actions: <Widget>[
             IconButton(
-              icon: const Icon(Icons.save,
-                  color: Color.fromARGB(255, 33, 219, 243)),
+              icon: const Icon(Icons.save, color: Colors.white),
               onPressed: () {
                 _showSaveDialog(context);
               },
