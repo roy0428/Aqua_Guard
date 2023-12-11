@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import './drawer_page/home.dart';
 import './drawer_page/profile.dart';
+import './drawer_page/statistic_example.dart';
 
 class BasicScreen extends StatefulWidget {
   final String username;
@@ -31,8 +32,7 @@ class _BasicScreenState extends State<BasicScreen> {
     });
   }
 
-  Widget listItem(BuildContext context, int index, IconData icon, String string,
-      bool page) {
+  Widget listItem(BuildContext context, int index, IconData icon, String string, bool page) {
     return Column(
       children: [
         GestureDetector(
@@ -48,8 +48,7 @@ class _BasicScreenState extends State<BasicScreen> {
               } else if (index == 2) {
                 launchUrl(Uri.parse('http://rainplusplus.com'));
               } else if (index == 3) {
-                launchUrl(Uri.parse(
-                    'https://www.gov.uk/government/organisations/natural-england'));
+                launchUrl(Uri.parse('https://www.gov.uk/government/organisations/natural-england'));
               }
             }
           },
@@ -68,6 +67,7 @@ class _BasicScreenState extends State<BasicScreen> {
     final List<Widget> _widgetOptions = <Widget>[
       HomePage(username: username),
       ProfilePage(),
+      Statistic_page(),
     ];
 
     return Scaffold(
@@ -78,6 +78,7 @@ class _BasicScreenState extends State<BasicScreen> {
             Image.asset('assets/moisture.png', height: 125, width: 100),
             listItem(context, 0, Icons.home, 'Home page', true),
             listItem(context, 1, Icons.account_circle, 'Profile', true),
+            listItem(context, 2, Icons.assessment, 'Statistics', true),
             listItem(context, 1, Icons.info, 'Water Research Centre', false),
             listItem(context, 2, Icons.info, 'Rain++', false),
             listItem(context, 3, Icons.info, 'Natural England', false),
